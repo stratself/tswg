@@ -1,0 +1,72 @@
+services:
+
+  tswg:
+
+    image: tswg 
+    build: .
+    restart: unless-stopped
+    container_name: tswg
+    
+    # Tested working on podman's pasta networking stack
+    # Please modify network mode according to your setup
+    network_mode: pasta
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+
+    sysctls:
+      # Required by Tailscale
+      - net.ipv4.ip_forward=1
+      - net.ipv6.conf.all.forwarding=1
+      # Required by WireGuard
+      - net.ipv4.conf.all.src_valid_mark=1
+
+    environment:
+    
+      ## Required user input
+      - WG_CONFIG=/tmp/example.wg0.conf
+
+      # Optional env vars for Tailscale
+      # - https://tailscale.com/kb/1282/docker
+      - TS_ACCEPT_DNS=true
+      - TS_EXTRA_ARGS=--login-server=https://<HEADSCALE-DOMAIN> --advertise-exit-node
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_HOSTNAME=test-exit-node # Will be randomized if not set
+
+      ## (Optional) provide IPs to be routed sans-WireGuard
+      ## Helps with logging into headscale first time
+      ## and may establish direct connections
+      - HOLEPUNCH_ENDPOINTS=HEADSCALE-IP-ADDRESS>
+
+    # Please make sure all mounts are accessible
+    # by the user inside the container
+    volumes:
+      - ./tailscale:/var/lib/tailscale
+      - ./example.wg0.conf:/tmp/example.wg0.conf:ro
+    
+
+    # Optional: run as non-root
+    # user: 1000:1000
+
+    # Optional: hard-code MagicDNS
+    # When running non-root, this is needed for MagicDNS connectivity
+    # dns:
+    #  - 100.100.100.100
+
+    # Optional: hard-code your headscale's IPs
+    # Will help with initial login if MagicDNS is hard-coded
+    # extra_hosts:
+    #   - "<HEADSCALE-DOMAIN>:<EXAMPLE-IPV4-ADDRESS>"
+    #   - "<HEADSCALE-DOMAIN>:<EXAMPLE-IPV6-ADDRESS>"
+
+    # Advanced, optional: Drop all caps and set no-new-privs bit
+    # security_opt:
+    #   no-new-privileges: true
+    # cap_drop:
+    #   - ALL
+
+    # Uncomment these lines to spin up the container without executing the init script
+    # This allows troubleshooting issues
+    # entrypoint: "/bin/sh"
+    # command: '-c "while : ; do sleep 1 ; done ;"'
