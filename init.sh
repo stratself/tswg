@@ -6,27 +6,15 @@ echo "Starting WireGuard"
 
 
 # Copied from wg-quick
-echo "Configuring the wg0 interface"
-ip link add wg0 type wireguard
-wg setconf wg0 $WG_CONFIG
-ip link set mtu 65440 up dev wg0
-wg set wg0 fwmark 51820
-
-echo "Configuring IPv6 routes"
-ip -6 route add ::/0 dev wg0 table 51820
-ip -6 rule add not fwmark 51820 table 51820
-ip -6 rule add table main suppress_prefixlength 0
-
-echo "Configuring IPv4 routes"
-ip -4 route add 0.0.0.0/0 dev wg0 table 51820
-ip -4 rule add not fwmark 51820 table 51820
-ip -4 rule add table main suppress_prefixlength 0
+echo "Using wg-quick to set up WireGuard tunnel"
+wg-quick up $WG_CONFIG
 
 WG_ENDPOINT=$(cat $WG_CONFIG | grep "^Endpoint =" | awk '{print $3}')
 WG_ENDPOINT_IP=$(echo $WG_ENDPOINT | grep -oE '^(.+?)[:]' | sed s/[][]//g | sed s/.$//)
 WG_ENDPOINT_PORT=$(echo $WG_ENDPOINT | sed -E s/.+://)
 
-# Check if IPv4 or IPv6 by filtering for colon
+# Hole-punching IPv4 endpoints in order to connect to upstream WireGuard itself via main interface
+
 if  [ $( echo $WG_ENDPOINT_IP | grep ':' ) ]
     then 
         echo $WG_ENDPOINT_IP
