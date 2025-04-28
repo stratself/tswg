@@ -1,9 +1,11 @@
+# Copied from https://github.com/Erisa/ts-derp-docker/
+# Thank you!
 name: docker-build
 
 on:
   push:
     branches:
-      - test
+      - main
 
 jobs:
   multi-arch-push:
