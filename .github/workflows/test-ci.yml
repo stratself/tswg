@@ -8,6 +8,11 @@ on:
 jobs:
   multi-arch-push:
     runs-on: ubuntu-latest
+    env:
+      STORAGE_DRIVER: vfs      
+      IMAGE_NAME: tswg
+      REGISTRY: ghcr.io/${{ github.actor }}
+
     steps:
       -
         name: Checkout
