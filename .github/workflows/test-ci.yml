@@ -1,0 +1,46 @@
+name: podman-build
+
+on:
+  push:
+    branches:
+      - test
+
+jobs:
+  multi-arch-push:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      -
+        name: Get Latest Tag
+        id: previoustag
+        uses: WyriHaximus/github-action-get-previous-tag@v1
+        with:
+          fallback: latest  
+
+      - 
+        name: Buildah build image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          oci: true
+          platforms: linux/amd64,linux/arm64
+          image: ${{ env.IMAGE_NAME }}
+          tags: ${{ github.sha }}
+          containerfiles: |
+            ./Containerfile
+          extra-args: |
+            --isolation=chroot
+            --cap-add=SYS_ADMIN
+
+      - name: Push to registry (manifest)
+        uses: https://forge.skds.dedyn.io/actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: ${{ env.REGISTRY }}        
+          username: ${{ github.actor }}
+          password: ${{ secrets.PAT_CONTAINERS_RW }}
