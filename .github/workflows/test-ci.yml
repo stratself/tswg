@@ -3,7 +3,7 @@ name: podman-build
 on:
   push:
     branches:
-      - main
+      - test
 
 jobs:
   multi-arch-push:
@@ -34,7 +34,7 @@ jobs:
           oci: true
           platforms: linux/amd64,linux/arm64
           image: ${{ env.IMAGE_NAME }}
-          tags: latest ${{ steps.previoustag.outputs.tag }}
+          tags: ${{ github.sha }}
           containerfiles: |
             ./Dockerfile
 
