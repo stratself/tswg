@@ -42,7 +42,7 @@ COPY --from=builder /build/binout/* /usr/local/bin/
 ENV TS_USERSPACE=false
 ENV TS_DEBUG_FIREWALL_MODE=nftables
 
-COPY ./wg-quick.bash /usr/bin/wg-quick
+COPY ./wg-quick /usr/bin/wg-quick
 COPY init.sh /init.sh
 RUN chmod +x /usr/bin/wg-quick /init.sh
 
