@@ -36,7 +36,7 @@ jobs:
           image: ${{ env.IMAGE_NAME }}
           tags: ${{ github.sha }}
           containerfiles: |
-            ./Containerfile
+            ./Dockerfile
           extra-args: |
             --isolation=chroot
             --cap-add=SYS_ADMIN
