@@ -10,7 +10,7 @@ Run a Tailscale exit node alongside a WireGuard tunnel from another VPN provider
 
   - Only `NET_ADMIN` is required
 
-  - No `wg-quick` dependency which requires sudo
+  - `wg-quick` with small fixes to run rootlessly
 
 - containerboot compliant
 
