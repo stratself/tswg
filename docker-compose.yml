@@ -3,9 +3,11 @@ services:
   tswg:
 
     image: tswg 
-    build: .
+
+    # Alternatively, build the container from source
+    # build: .
     restart: unless-stopped
-    container_name: tswg
+    container_name: ghcr.io/skedastically/tswg:latest
     
     # Tested working on podman's pasta networking stack
     # Please modify network mode according to your setup
