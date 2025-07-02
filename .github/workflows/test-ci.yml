@@ -37,9 +37,6 @@ jobs:
           tags: ${{ github.sha }}
           containerfiles: |
             ./Dockerfile
-          extra-args: |
-            --isolation=chroot
-            --cap-add=SYS_ADMIN
 
       - name: Push to registry (manifest)
         uses: redhat-actions/push-to-registry@v2
