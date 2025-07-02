@@ -22,14 +22,11 @@ Run a Tailscale exit node alongside a WireGuard tunnel from another VPN provider
 
 ## Howto
 
-Requires some docker-compose knowledge
+See `docker-compose.yml` for the main configuration values. Most of the explanations are commented in there.
 
 1. Clone the repo and optionally build the container
 
-2. Provide your own WireGuard config file from your commercial VPN provider. Edit it to look like `example.wg0.conf`:
-   - `wg-quick` variables like `Address` or `PreDown/PostUp` are **not supported**, as they'll error out whilst running `wg setconf`
-
-3. Configure `docker-compose.yml` to your own tastes and bring it up. Most of the explanations are commented in there.
+2. Configure `docker-compose.yml` to your own tastes and bring it up
 
 ## Environment variables
 
