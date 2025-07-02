@@ -1,6 +1,4 @@
-# Copied from https://github.com/Erisa/ts-derp-docker/
-# Thank you!
-name: docker-build
+name: podman-build
 
 on:
   push:
@@ -10,6 +8,11 @@ on:
 jobs:
   multi-arch-push:
     runs-on: ubuntu-latest
+    env:
+      STORAGE_DRIVER: vfs      
+      IMAGE_NAME: tswg
+      REGISTRY: ghcr.io/${{ github.actor }}
+
     steps:
       -
         name: Checkout
@@ -17,31 +20,29 @@ jobs:
         with:
           fetch-depth: 0
       -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        name: Get Latest Tag
+        id: previoustag
+        uses: WyriHaximus/github-action-get-previous-tag@v1
+        with:
+          fallback: latest  
+
       - 
-        name: Login to GitHub Registry
-        uses: docker/login-action@v3
+        name: Buildah build image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
         with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GH_PAT }}
-      -
-         name: Get Latest Tag
-         id: previoustag
-         uses: WyriHaximus/github-action-get-previous-tag@v1
-         with:
-          fallback: latest
-      -
-        name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
+          oci: true
           platforms: linux/amd64,linux/arm64
-          push: true
-          tags: |
-            ghcr.io/skedastically/tswg:latest
-            ghcr.io/skedastically/tswg:${{ steps.previoustag.outputs.tag }}
-          cache-from: type=gha,mode=max
-          cache-to: type=gha,mode=max
+          image: ${{ env.IMAGE_NAME }}
+          tags: ${{ github.sha }}
+          containerfiles: |
+            ./Dockerfile
+
+      - name: Push to registry (manifest)
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: ${{ env.REGISTRY }}        
+          username: ${{ github.actor }}
+          password: ${{ secrets.GH_PAT }}
