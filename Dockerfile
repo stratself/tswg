@@ -11,7 +11,7 @@ FROM --platform=${BUILDPLATFORM} alpine:${ALPINE_VERSION} AS builder
 LABEL org.opencontainers.image.source = https://github.com/skedastically/tswg
 
 ### Build argument(s)
-ARG TAILSCALE_VERSION=v1.80.3
+ARG TAILSCALE_VERSION=v1.82.0
 
 ### Build dependancies
 RUN apk add git bash curl --no-cache
