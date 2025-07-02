@@ -43,4 +43,4 @@ jobs:
           tags: ${{ steps.build-image.outputs.tags }}
           registry: ${{ env.REGISTRY }}        
           username: ${{ github.actor }}
-          password: ${{ secrets.PAT_CONTAINERS_RW }}
+          password: ${{ secrets.GH_PAT }}
