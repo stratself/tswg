@@ -11,7 +11,7 @@ FROM --platform=${BUILDPLATFORM} alpine:${ALPINE_VERSION} AS builder
 LABEL org.opencontainers.image.source = https://github.com/skedastically/tswg
 
 ### Build argument(s)
-ARG TAILSCALE_VERSION=v1.86.4
+ARG TAILSCALE_VERSION=v1.88.3
 
 ### Build dependancies
 RUN apk add git bash curl --no-cache
@@ -33,7 +33,6 @@ FROM alpine:${ALPINE_VERSION}
 
 ### Runtime dependancies
 RUN apk add --no-cache \
-    curl \
     nftables \
     iproute2 \
     wireguard-tools
