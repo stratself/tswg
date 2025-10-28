@@ -1,8 +1,8 @@
 # tswg
 
-Run a Tailscale exit node alongside a WireGuard tunnel from another VPN provider. Tested working on rootless Podman.
+Daisy chain a Tailscale with a WireGuard tunnel from another VPN provider, to create a VPN exit node for your tailnet.
 
-**This is highly experimental**, I'm a noob etc... please open issues to correct any of my footguns that you can find.
+Tested working on rootless Podman. Although this is highly experimental, so please open issues to correct any of my footguns that you can find.
 
 ## Features
 
@@ -12,7 +12,7 @@ Run a Tailscale exit node alongside a WireGuard tunnel from another VPN provider
 
   - `wg-quick` with small fixes to run rootlessly
 
-- containerboot compliant
+- [containerboot](https://pkg.go.dev/tailscale.com/cmd/containerboot) compliant
 
 - IPv4 and IPv6 ip rules included
 
@@ -26,7 +26,9 @@ See `docker-compose.yml` for the main configuration values. Most of the explanat
 
 1. Clone the repo and optionally build the container
 
-2. Configure `docker-compose.yml` to your own tastes and bring it up
+2. Fetch a WireGuard file from your VPN provider and format it to look like `./example.wg0.conf`. The main tweak is to remove the DNS field.
+
+3. Configure `docker-compose.yml` to your own tastes and bring it up
 
 ## Environment variables
 
@@ -43,6 +45,21 @@ These env vars are changed from [Tailscale defaults](https://tailscale.com/kb/12
 | ------------------------ | ---------- | --------------------------- |
 | `TS_USERSPACE`           | `false`    | Changed to false by default |
 | `TS_DEBUG_FIREWALL_MODE` | `nftables` | Force use of new nftables instead of auto mode   |
+
+## Security and other issues
+
+- Unlike Tailscale's Mullvad exit node, this container does not have `IsJailed` and `IsWireguardOnly` functionality toggled on for traffic restrictions. Please control traffic flows using ACL or grants.
+
+- This image provides a feature akin to [multihop](https://www.procustodibus.com/blog/2022/06/multi-hop-wireguard/#internet-gateway-as-a-spoke), whereby the first hop is controlled at a location that you can host. Therefore, the speed is reduced, and can significantly slow down if your VPN endpoint is far away from your tswg instance.
+
+    ```mermaid
+    graph LR
+      client --> tswg[tswg in us] --> vpn1[vpn in canada]
+      client --> tswg[tswg in us] ---> vpn2[vpn in germany]
+      client --> tswg[tswg in us] ----> vpn3[vpn in japan]
+    ```
+
+- This image provides an alternative to headscale's current (lack of) [WireGuard only peers](https://github.com/juanfont/headscale/issues/1545) implementation
 
 ## Alternatives
 
