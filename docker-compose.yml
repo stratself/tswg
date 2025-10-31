@@ -3,7 +3,7 @@ services:
   tswg:
 
     container_name: tswg 
-    image: ghcr.io/skedastically/tswg:latest
+    image: ghcr.io/stratself/tswg:latest
     # Alternatively, build the container from source
     # build: .
     restart: unless-stopped
