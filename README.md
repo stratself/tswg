@@ -2,7 +2,7 @@
 
 Daisy chain a Tailscale with a WireGuard tunnel from another VPN provider, to create a VPN exit node for your tailnet.
 
-Tested working on rootless Podman. Although this is highly experimental, so please open issues to correct any of my footguns that you can find.
+Tested working on rootless Podman. Please open issues to correct any footguns you found.
 
 ## Features
 
@@ -22,13 +22,10 @@ Tested working on rootless Podman. Although this is highly experimental, so plea
 
 ## Howto
 
-See `docker-compose.yml` for the main configuration values. Most of the explanations are commented in there.
+1. Fetch a WireGuard file from your VPN provider and format it to look like `./example.wg0.conf`. The main tweak is to remove the DNS field.
 
-1. Clone the repo and optionally build the container
+2. Configure `docker-compose.yml` to your own tastes and bring it up. Most of the explanations and config values are commented in there.
 
-2. Fetch a WireGuard file from your VPN provider and format it to look like `./example.wg0.conf`. The main tweak is to remove the DNS field.
-
-3. Configure `docker-compose.yml` to your own tastes and bring it up
 
 ## Environment variables
 
@@ -45,6 +42,8 @@ These env vars are changed from [Tailscale defaults](https://tailscale.com/kb/12
 | ------------------------ | ---------- | --------------------------- |
 | `TS_USERSPACE`           | `false`    | Changed to false by default |
 | `TS_DEBUG_FIREWALL_MODE` | `nftables` | Force use of new nftables instead of auto mode   |
+
+Other Tailscale [env vars for Docker](https://tailscale.com/kb/1282/docker) should work too.
 
 ## Security and other issues
 
