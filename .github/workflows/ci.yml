@@ -2,10 +2,9 @@ name: podman-build
 
 on:
   push:
-    branches:
-      - main
     tags:
       - "*"
+
 jobs:
   multi-arch-push:
     runs-on: ubuntu-latest
