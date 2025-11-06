@@ -1,0 +1,46 @@
+name: podman-build
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ./Dockerfile
+  workflow_dispatch:
+    
+jobs:
+  multi-arch-push:
+    runs-on: ubuntu-latest
+    env:
+      STORAGE_DRIVER: vfs      
+      IMAGE_NAME: tswg
+      REGISTRY: ghcr.io/${{ github.actor }}
+
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - 
+        name: Buildah build image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          oci: true
+          platforms: linux/amd64,linux/arm64
+          image: ${{ env.IMAGE_NAME }}
+          tags: main
+          containerfiles: |
+            ./Dockerfile
+
+      - name: Push to registry (manifest)
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: ${{ env.REGISTRY }}        
+          username: ${{ github.actor }}
+          password: ${{ secrets.GH_PAT }}
+
