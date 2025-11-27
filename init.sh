@@ -43,4 +43,31 @@ if [[ -z $HOLEPUNCH_ENDPOINTS ]]; then
 fi
 
 echo "Starting tailscale"
-/usr/local/bin/containerboot
+/usr/local/bin/containerboot &
+
+# Sockd stuff
+if [ "${TSWG_SOCKD_ENABLED}" == "true" ]; then
+    
+    echo "SOCKS5 enabled"
+    export TSWG_DANTE_FILE=${TSWG_SOCKD_FILE};
+    
+    if [ -n $TSWG_DANTE_FILE ]; then
+
+        cp /etc/sockd.conf /tmp/sockd.conf.tmp
+        export TSWG_DANTE_FILE="/tmp/sockd.conf.tmp"
+
+        TSWG_DANTE_PORT=${TSWG_SOCKD_PORT:-"1080"}
+        sed -i s/TSWG_DANTE_PORT/${TSWG_DANTE_PORT}/g $TSWG_DANTE_FILE
+
+        TSWG_DANTE_EXTERNAL=$(basename ${WG_CONFIG%.conf})
+        sed -i s/TSWG_DANTE_EXTERNAL/${TSWG_DANTE_EXTERNAL}/g $TSWG_DANTE_FILE
+    
+    fi;
+
+    echo "Starting SOCKS5 proxy"
+    sleep ${TSWG_SOCKD_TIMEIN:-3}
+    sockd -f ${TSWG_DANTE_FILE}
+fi
+
+# Avoid script from exiting
+while : ; do sleep 1 ; done ;

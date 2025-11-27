@@ -35,7 +35,9 @@ FROM alpine:${ALPINE_VERSION}
 RUN apk add --no-cache \
     nftables \
     iproute2 \
-    wireguard-tools
+    wireguard-tools \
+    sed \
+    dante-server
 
 COPY --from=builder /build/binout/* /usr/local/bin/
 ENV TS_USERSPACE=false
@@ -43,6 +45,7 @@ ENV TS_DEBUG_FIREWALL_MODE=nftables
 
 COPY ./wg-quick /usr/bin/wg-quick
 COPY init.sh /init.sh
+COPY sockd.conf /etc/sockd.conf
 RUN chmod +x /usr/bin/wg-quick /init.sh
 
 ENTRYPOINT ["/init.sh"]

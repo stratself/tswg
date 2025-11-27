@@ -40,6 +40,14 @@ services:
       ## and may establish direct connections
       - HOLEPUNCH_ENDPOINTS=HEADSCALE-IP-ADDRESS>
 
+      ## (Optional) Use SOCKS5 proxy (sockd)
+
+      # - TSWG_SOCKD_ENABLED=true
+      # - TSWG_SOCKD_PORT=1080 # SOCKS5 port number (default: 1080)
+      
+      # Alternatively, point to a mounted file
+      # - TSWG_SOCKD_FILE=true
+
     # Please make sure all mounts are accessible
     # by the user inside the container
     volumes:

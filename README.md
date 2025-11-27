@@ -34,7 +34,7 @@ Specific env vars for this image:
 | Name                     | Default    | Description                                                                                                                                                                    |
 | ------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `WG_CONFIG`              | `none`     | Path to your WireGuard config file                                                                                                                                             |
-| `HOLEPUNCH_ENDPOINTS`    | `none`     | (Optional) Custom endpoints in `IP:Port` format that will not go through the WireGuard tunnel. Useful for connecting to Headscale if set. Only IPv4 and TCP traffic is supported for now. |
+| `HOLEPUNCH_ENDPOINTS`    | `none`     | (Optional) Custom endpoints in `IPv4:Port` format that bypass the WireGuard tunnel. Useful for connecting to your own Headscale. |
 
 These env vars are changed from [Tailscale defaults](https://tailscale.com/kb/1282/docker):
 
@@ -43,7 +43,23 @@ These env vars are changed from [Tailscale defaults](https://tailscale.com/kb/12
 | `TS_USERSPACE`           | `false`    | Changed to false by default |
 | `TS_DEBUG_FIREWALL_MODE` | `nftables` | Force use of new nftables instead of auto mode   |
 
-Other Tailscale [env vars for Docker](https://tailscale.com/kb/1282/docker) should work too.
+Other Tailscale [env vars for Docker](https://tailscale.com/kb/1282/docker) should also work.
+
+### SOCKS5 proxy
+
+You can enable a SOCKS5 proxy server powered by [Dante](https://www.inet.no/dante/). This is a replacement for Tailscale's embedded proxy (`TS_SOCKS5_PROXY`), which doesn't work for some [reason](https://github.com/stratself/tswg/issues/4).
+
+It has the following env vars:
+
+| Name                 | Default | Description                                                                                      |
+| -------------------- | ------- | ------------------------------------------------------------------------------------------------ |
+| `TSWG_SOCKD_ENABLED` |         | Set to `true` to enable sockd                                                                    |
+| `TSWG_SOCKD_PORT`    | `1080`  | Port number to expose tswg on                                                                    |
+| `TSWG_SOCKD_FILE`    |         | Mount your own `sockd.conf` file for advanced usage. `TSWG_SOCKD_PORT` will be ignored |
+| `TSWG_SOCKD_TIMEIN`  | `3`     | Seconds to wait until starting the socks daemon                                                  |
+
+The default `sockd.conf` file is at `/etc/sockd.conf` and will get copied to `/tmp/sockd.conf.tmp` before enabling. For more information on the config file, check out its [man page](https://man.archlinux.org/man/sockd.conf.5.en).
+
 
 ## Security and other issues
 
