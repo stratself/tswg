@@ -83,3 +83,4 @@ The default `sockd.conf` file is at `/etc/sockd.conf` and will get copied to `/t
 
 - [Gluetun](https://github.com/qdm12/gluetun/) + Tailscale has strict firewalls that conflicts with Tailscale running on non-userspace mode. If someone gets theirs working, please share (probably some postrouting rules that I haven't looked into).
 - [Wireproxy](https://github.com/whyvl/wireproxy) + [tun2socks](https://github.com/xjasonlyu/tun2socks/) kind of worked but segfaults every 5 minutes for some reason.
+- [Tailguard](https://github.com/juhovh/tailguard) seems to be the most similar candidate, though it can also be used for general WireGuard routing.
