@@ -47,6 +47,9 @@ Other Tailscale [env vars for Docker](https://tailscale.com/kb/1282/docker) shou
 
 ### SOCKS5 proxy
 
+> [!IMPORTANT]
+> This feature is only available in the `main` image branch right now
+
 You can enable a SOCKS5 proxy server powered by [Dante](https://www.inet.no/dante/). This is a replacement for Tailscale's embedded proxy (`TS_SOCKS5_PROXY`), which doesn't work for some [reason](https://github.com/stratself/tswg/issues/4).
 
 It has the following env vars:
