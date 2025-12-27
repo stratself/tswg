@@ -33,8 +33,11 @@ Specific env vars for this image:
 
 | Name                     | Default    | Description                                                                                                                                                                    |
 | ------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `WG_CONFIG`              | `none`     | Path to your WireGuard config file                                                                                                                                             |
-| `HOLEPUNCH_ENDPOINTS`    | `none`     | (Optional) Custom endpoints in `IPv4:Port` format that bypass the WireGuard tunnel. Useful for connecting to your own Headscale. |
+| `TSWG_WGCONF`              | `none`     | Path to your WireGuard config file                                                                                                                                             |
+| `TSWG_HOLEPUNCH_ENDPOINTS`    | `none`     | (Optional) Custom endpoints in `IPv4:Port` format that bypass the WireGuard tunnel. Useful for connecting to your own Headscale. |
+
+The legacy variables `WG_CONFIG` and `HOLEPUNCH_ENDPOINTS` in versions prior to `v1.92.4` are also supported as fallback variables.
+
 
 These env vars are changed from [Tailscale defaults](https://tailscale.com/kb/1282/docker):
 
