@@ -6,46 +6,45 @@
 ARG ALPINE_VERSION=3.23
 
 ## Build container
-
 FROM --platform=${BUILDPLATFORM} alpine:${ALPINE_VERSION} AS builder
-LABEL org.opencontainers.image.source = https://github.com/skedastically/tswg
 
 ### Build argument(s)
-ARG TAILSCALE_VERSION=v1.92.3
-
-### Build dependancies
-RUN apk add git bash curl --no-cache
-
-ARG TARGETOS
-ARG TARGETARCH
+ARG TARGETOS TARGETARCH TAILSCALE_VERSION=v1.92.3
 
 WORKDIR /build
 
-### Clone the right version of Tailscale
-RUN git clone https://github.com/tailscale/tailscale --depth=1 --branch ${TAILSCALE_VERSION} .
+### Build
+RUN << HEREDOC
 
-### Build all the needed binaries
-RUN mkdir binout && GOOS=${TARGETOS} GOARCH=${TARGETARCH} ./tool/go build -o ./binout . ./cmd/tailscale ./cmd/tailscaled ./cmd/containerboot 
+    # install dependencies
+    apk -U add --no-cache git bash curl
+    # clone repo on defined version branch
+    git clone --depth=1 --branch ${TAILSCALE_VERSION} https://github.com/tailscale/tailscale .
+    mkdir binout
+    
+    # build tailscaled and containerboot
+    GOOS=${TARGETOS} GOARCH=${TARGETARCH} ./tool/go build -o ./binout . ./cmd/tailscale ./cmd/tailscaled ./cmd/containerboot 
+
+    HEREDOC
 
 ## Runtime container
-
 FROM alpine:${ALPINE_VERSION}
 
 ### Runtime dependancies
-RUN apk add --no-cache \
-    nftables \
-    iproute2 \
-    wireguard-tools \
-    sed \
-    dante-server
+RUN apk add --no-cache wireguard-tools nftables dante-server
 
+### Copy files
 COPY --from=builder /build/binout/* /usr/local/bin/
-ENV TS_USERSPACE=false
-ENV TS_DEBUG_FIREWALL_MODE=nftables
-
-COPY ./wg-quick /usr/bin/wg-quick
-COPY init.sh /init.sh
+COPY --chmod=+x ./wg-quick /usr/bin/wg-quick
+COPY --chmod=+x init.sh /init.sh
 COPY sockd.conf /etc/sockd.conf
-RUN chmod +x /usr/bin/wg-quick /init.sh
 
+### Define default env vars and entrypoint
+ENV TS_USERSPACE=false TS_DEBUG_FIREWALL_MODE=nftables
 ENTRYPOINT ["/init.sh"]
+
+### Add labels
+LABEL org.opencontainers.image.title="tswg"
+LABEL org.opencontainers.image.description="Tailscale + WireGuard exit node"
+LABEL org.opencontainers.image.authors="https://github.com/stratself"
+LABEL org.opencontainers.image.source="https://github.com/stratself/tswg"
