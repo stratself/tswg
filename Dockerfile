@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1
+
 # Copied and modified from
 # https://github.com/erisa/ts-derp-docker
 # Thank you!
