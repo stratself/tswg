@@ -29,8 +29,8 @@ RUN apk add --no-cache wireguard-tools nftables dante-server
 
 ### Copy files
 COPY --from=builder /build/binout/* /usr/local/bin/
-COPY --chmod=+x ./wg-quick /usr/bin/wg-quick
-COPY --chmod=+x init.sh /init.sh
+COPY --chmod=755 ./wg-quick /usr/bin/wg-quick
+COPY --chmod=755 init.sh /init.sh
 COPY sockd.conf /etc/sockd.conf
 
 ### Define default env vars and entrypoint
