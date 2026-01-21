@@ -14,18 +14,18 @@ ARG TARGETOS TARGETARCH TAILSCALE_VERSION=v1.92.3
 WORKDIR /build
 
 ### Build
-RUN << HEREDOC
+RUN <<HEREDOC
 
-    # install dependencies
-    apk -U add --no-cache git bash curl
-    # clone repo on defined version branch
-    git clone --depth=1 --branch ${TAILSCALE_VERSION} https://github.com/tailscale/tailscale .
-    mkdir binout
-    
-    # build tailscaled and containerboot
-    GOOS=${TARGETOS} GOARCH=${TARGETARCH} ./tool/go build -o ./binout . ./cmd/tailscale ./cmd/tailscaled ./cmd/containerboot 
+# install dependencies
+apk -U add --no-cache git bash curl
+# clone repo on defined version branch
+git clone --depth=1 --branch ${TAILSCALE_VERSION} https://github.com/tailscale/tailscale .
+mkdir binout
 
-    HEREDOC
+# build tailscaled and containerboot
+GOOS=${TARGETOS} GOARCH=${TARGETARCH} ./tool/go build -o ./binout . ./cmd/tailscale ./cmd/tailscaled ./cmd/containerboot 
+
+HEREDOC
 
 ## Runtime container
 FROM alpine:${ALPINE_VERSION}
