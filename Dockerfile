@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1
-
 # Copied and modified from
 # https://github.com/erisa/ts-derp-docker
 # Thank you!
@@ -15,19 +13,13 @@ ARG TARGETOS TARGETARCH TAILSCALE_VERSION=v1.92.3
 
 WORKDIR /build
 
-### Build
-RUN <<HEREDOC
+### Prepare build: install dependencies
+RUN apk -U add --no-cache git bash curl && \
+    git clone --depth=1 --branch ${TAILSCALE_VERSION} https://github.com/tailscale/tailscale . && \
+    mkdir binout
 
-# install dependencies
-apk -U add --no-cache git bash curl
-# clone repo on defined version branch
-git clone --depth=1 --branch ${TAILSCALE_VERSION} https://github.com/tailscale/tailscale .
-mkdir binout
-
-# build tailscaled and containerboot
-GOOS=${TARGETOS} GOARCH=${TARGETARCH} ./tool/go build -o ./binout . ./cmd/tailscale ./cmd/tailscaled ./cmd/containerboot 
-
-HEREDOC
+# Build containerboot and tailscaled
+RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} ./tool/go build -o ./binout . ./cmd/tailscale ./cmd/tailscaled ./cmd/containerboot 
 
 ## Runtime container
 FROM alpine:${ALPINE_VERSION}
