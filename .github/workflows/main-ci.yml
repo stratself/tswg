@@ -5,13 +5,15 @@ on:
     branches:
       - main
     paths:
-      - ./init.sh
-      - ./wg-quick
-      - ./Dockerfile
+      - init.sh
+      - wg-quick
+      - Dockerfile
+      - .github/workflows/**
   workflow_dispatch:
     
 jobs:
   multi-arch-push:
+
     runs-on: ubuntu-latest
     env:
       STORAGE_DRIVER: vfs      
@@ -19,14 +21,13 @@ jobs:
       REGISTRY: ghcr.io/${{ github.actor }}
 
     steps:
-      -
-        name: Checkout
+
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - 
-        name: Buildah build image
+      - name: Buildah build image
         id: build-image
         uses: redhat-actions/buildah-build@v2
         with:

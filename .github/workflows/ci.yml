@@ -14,14 +14,13 @@ jobs:
       REGISTRY: ghcr.io/${{ github.actor }}
 
     steps:
-      -
-        name: Checkout
+
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - 
-        name: Buildah build image
+      - name: Buildah build image
         id: build-image
         uses: redhat-actions/buildah-build@v2
         with:
@@ -40,4 +39,3 @@ jobs:
           registry: ${{ env.REGISTRY }}        
           username: ${{ github.actor }}
           password: ${{ secrets.GH_PAT }}
-
