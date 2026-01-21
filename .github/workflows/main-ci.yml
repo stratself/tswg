@@ -7,7 +7,7 @@ on:
     paths:
       - init.sh
       - wg-quick
-      - Dockerfile
+      - Dockerfile**
       - .github/workflows/**
   workflow_dispatch:
     

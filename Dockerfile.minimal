@@ -18,12 +18,12 @@ WORKDIR /build
 ### Prepare build: install dependencies
 RUN apk -U add --no-cache git bash curl && \
     git clone --depth=1 --branch ${TAILSCALE_VERSION} https://github.com/tailscale/tailscale . && \
-    mkdir binout && \
+    mkdir binout
     
 ### With minimal featureflags, build containerboot and cli-embedded tailscaled
 RUN export TAGS=$(./tool/go run cmd/featuretags/featuretags.go -min -add $FEATURETAGS) && \
     GOOS=${TARGETOS} GOARCH=${TARGETARCH} ./tool/go build \
-        -o ./binout -ldflags "-w -s" -tags "$TAILSCALED_TAGS" \
+        -o ./binout -ldflags "-w -s" -tags "$TAGS" \
         . ./cmd/containerboot ./cmd/tailscaled  && \
         cd binout && ln -s tailscaled tailscale
 
