@@ -18,7 +18,7 @@ RUN apk -U add --no-cache git bash curl && \
     git clone --depth=1 --branch ${TAILSCALE_VERSION} https://github.com/tailscale/tailscale . && \
     mkdir binout
 
-# Build containerboot and tailscaled
+### Build containerboot, tailscale cli, and tailscaled
 RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} ./tool/go build -o ./binout . ./cmd/tailscale ./cmd/tailscaled ./cmd/containerboot 
 
 ## Runtime container

@@ -20,6 +20,14 @@ jobs:
       IMAGE_NAME: tswg
       REGISTRY: ghcr.io/${{ github.actor }}
 
+    strategy:
+      matrix:
+        include:
+          - tag: main
+            containerfile: Dockerfile
+          - tag: main-minimal
+            containerfile: Dockerfile.minimal
+
     steps:
 
       - name: Checkout
@@ -34,9 +42,8 @@ jobs:
           oci: true
           platforms: linux/amd64,linux/arm64
           image: ${{ env.IMAGE_NAME }}
-          tags: main
-          containerfiles: |
-            ./Dockerfile
+          tags: ${{ matrix.tag }}
+          containerfiles: ${{ matrix.containerfile }}
 
       - name: Push to registry (manifest)
         uses: redhat-actions/push-to-registry@v2
