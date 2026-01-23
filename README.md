@@ -1,31 +1,23 @@
 # tswg
 
-Daisy chain a Tailscale with a WireGuard tunnel from another VPN provider, to create a VPN exit node for your tailnet.
+Daisy chain a Tailscale with a WireGuard tunnel from another VPN provider, to create a VPN exit node for your tailnet. Features include:
+
+- Runnable in non-root containers
+  - Only `NET_ADMIN` is required
+  - `wg-quick` with small fixes to run rootlessly
+- [containerboot](https://pkg.go.dev/tailscale.com/cmd/containerboot) compliant for proper `TS_` env vars
+- Dual-stack IP rules included
+- Kernelspace networking for container-native network access - good for running with MagicDNS and your own Pi-Hole.
+- Custom v4 endpoints to not be routed through the WireGuard interface (i.e. holepunch).
+- `minimal` image with reduced features and smaller binaries (recommended)
 
 Tested working on rootless Podman. Please open issues to correct any footguns you found.
 
-## Features
-
-- Runnable in non-root containers
-
-  - Only `NET_ADMIN` is required
-
-  - `wg-quick` with small fixes to run rootlessly
-
-- [containerboot](https://pkg.go.dev/tailscale.com/cmd/containerboot) compliant
-
-- IPv4 and IPv6 ip rules included
-
-- Other tailnet nodes and MagicDNS natively accessible (via ping,curl,etc). Good for running with your own Pi-Hole.
-
-- Custom endpoints to not be routed through the WireGuard interface.
-
 ## Howto
 
-1. Fetch a WireGuard file from your VPN provider and format it to look like `./example.wg0.conf`. The main tweak is to remove the DNS field.
+1. Fetch a WireGuard file from your VPN provider and format it to look like `./example.wg0.conf`. The main tweak is to remove the DNS field and add `PersistentKeepalive` to a low value.
 
 2. Configure `docker-compose.yml` to your own tastes and bring it up. Most of the explanations and config values are commented in there.
-
 
 ## Environment variables
 
@@ -33,36 +25,39 @@ Specific env vars for this image:
 
 | Name                     | Default    | Description                                                                                                                                                                    |
 | ------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `TSWG_WGCONF`              | `none`     | Path to your WireGuard config file                                                                                                                                             |
-| `TSWG_HOLEPUNCH_ENDPOINTS`    | `none`     | (Optional) Custom endpoints in `IPv4:Port` format that bypass the WireGuard tunnel. Useful for connecting to your own Headscale. |
+| `TSWG_WGCONF`,`WG_CONFIG`              | `none`     | Path to your WireGuard config file                                                                                                                                             |
+| `TSWG_HOLEPUNCH_ENDPOINTS`,`HOLEPUNCH_ENDPOINTS`    | `none`     | (Optional) Custom endpoints in `IPv4:Port` format that bypass the WireGuard tunnel. Useful for connecting to your own Headscale. |
 
-The legacy variables `WG_CONFIG` and `HOLEPUNCH_ENDPOINTS` in versions prior to `v1.92.4` are also supported as fallback variables.
-
-
-These env vars are changed from [Tailscale defaults](https://tailscale.com/kb/1282/docker):
-
-| Name                     | Default    | Description                 |
-| ------------------------ | ---------- | --------------------------- |
-| `TS_USERSPACE`           | `false`    | Changed to false by default |
-| `TS_DEBUG_FIREWALL_MODE` | `nftables` | Force use of new nftables instead of auto mode   |
-
-Other Tailscale [env vars for Docker](https://tailscale.com/kb/1282/docker) should also work.
 
 ### SOCKS5 proxy
 
-You can enable a SOCKS5 proxy server powered by [Dante](https://www.inet.no/dante/). This is a replacement for Tailscale's embedded proxy (`TS_SOCKS5_PROXY`), which doesn't work for some [reason](https://github.com/stratself/tswg/issues/4).
-
-It has the following env vars:
+A [Dante](https://www.inet.no/dante/)-powered SOCKS proxy can be enabled, as a replacement for Tailscale's embedded proxy (`TS_SOCKS5_PROXY`) that [doesn't work for now](https://github.com/stratself/tswg/issues/4). It has the following env vars:
 
 | Name                 | Default | Description                                                                                      |
 | -------------------- | ------- | ------------------------------------------------------------------------------------------------ |
 | `TSWG_SOCKD_ENABLED` |         | Set to `true` to enable sockd                                                                    |
 | `TSWG_SOCKD_PORT`    | `1080`  | Port number to expose tswg on                                                                    |
 | `TSWG_SOCKD_FILE`    |         | Mount your own `sockd.conf` file for advanced usage. `TSWG_SOCKD_PORT` will be ignored |
-| `TSWG_SOCKD_TIMEIN`  | `3`     | Seconds to wait until starting the socks daemon                                                  |
+| `TSWG_SOCKD_TIMEIN`  | `3`     | Seconds to wait (since executing containerboot) until starting the socks daemon                                                  |
 
 The default `sockd.conf` file is at `/etc/sockd.conf` and will get copied to `/tmp/sockd.conf.tmp` before enabling. For more information on the config file, check out its [man page](https://man.archlinux.org/man/sockd.conf.5.en).
 
+### Miscellaneous
+
+Other Tailscale [env vars for Docker](https://tailscale.com/kb/1282/docker) should also work. Some are changed from [Tailscale defaults](https://tailscale.com/kb/1282/docker) to support kernespace networking:
+
+| Name                     | Default    | Description                 |
+| ------------------------ | ---------- | --------------------------- |
+| `TS_USERSPACE`           | `false`    | Changed to false by default |
+| `TS_DEBUG_FIREWALL_MODE` | `nftables` | Force use of new nftables instead of auto mode   |
+
+## Image tags
+
+- `main`: normal Tailscale image, tracks main branch
+- `latest`: normal Tailscale image, tracks latest tags 
+- `minimal` suffix (i.e. `latest-minimal` and `main-minimal`): Tailscale with reduced featureset and smaller binaries
+
+`latest-minimal` is recommended.
 
 ## Security and other issues
 
