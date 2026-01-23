@@ -22,9 +22,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - tag: main
+          - versionsuffix: ""
             containerfile: Dockerfile
-          - tag: main-minimal
+          - versionsuffix: -minimal
             containerfile: Dockerfile.minimal
 
     steps:
@@ -41,7 +41,7 @@ jobs:
           oci: true
           platforms: linux/amd64,linux/arm64
           image: ${{ env.IMAGE_NAME }}
-          tags: ${{ matrix.tag }}
+          tags: main${{ matrix.versionsuffix }}
           containerfiles: ${{ matrix.containerfile }}
 
       - name: Push to registry (manifest)
