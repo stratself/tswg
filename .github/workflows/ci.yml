@@ -15,9 +15,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - tag: main
+          - tag: latest
             containerfile: Dockerfile
-          - tag: main-minimal
+          - tag: latest-minimal
             containerfile: Dockerfile.minimal
 
     steps:
