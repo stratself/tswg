@@ -15,8 +15,6 @@ jobs:
   multi-arch-push:
 
     runs-on: ubuntu-latest
-    container:
-      image: quay.io/containers/aio:latest
 
     env:
       IMAGE_NAME: tswg
@@ -32,11 +30,6 @@ jobs:
             containerfile: Dockerfile.minimal
 
     steps:
-
-      - name: Install relevant packages
-        run: |
-          dnf upgrade -y
-          dnf install git nodejs curl -y
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -64,7 +57,7 @@ jobs:
           containerfiles: ${{ matrix.containerfile }}
 
 
-      - name: Push to registry (manifest)
+      - name: Push to registry
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ env.IMAGE_NAME }}
