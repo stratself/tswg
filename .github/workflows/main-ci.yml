@@ -15,9 +15,13 @@ jobs:
   multi-arch-push:
 
     runs-on: ubuntu-latest
+    container:
+      image: quay.io/containers/aio:latest
+
     env:
       IMAGE_NAME: tswg
       REGISTRY: ghcr.io/${{ github.actor }}
+      STORAGE_DRIVER: vfs
 
     strategy:
       matrix:
@@ -29,26 +33,42 @@ jobs:
 
     steps:
 
+      - name: Install relevant packages
+        run: |
+          dnf upgrade -y
+          dnf install git nodejs curl -y
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Buildah build image
-        id: build-image
+      - name: Buildah build image (amd64)
+        id: build-image-amd64
         uses: redhat-actions/buildah-build@v2
         with:
           oci: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           image: ${{ env.IMAGE_NAME }}
-          tags: main${{ matrix.versionsuffix }}
+          tags: main${{ matrix.versionsuffix }}-amd64
           containerfiles: ${{ matrix.containerfile }}
+
+      - name: Buildah build image
+        id: build-image-arm64
+        uses: redhat-actions/buildah-build@v2
+        with:
+          oci: true
+          platforms: linux/arm64
+          image: ${{ env.IMAGE_NAME }}
+          tags: main${{ matrix.versionsuffix }}-arm64
+          containerfiles: ${{ matrix.containerfile }}
+
 
       - name: Push to registry (manifest)
         uses: redhat-actions/push-to-registry@v2
         with:
-          image: ${{ steps.build-image.outputs.image }}
-          tags: ${{ steps.build-image.outputs.tags }}
+          image: ${{ env.IMAGE_NAME }}
+          tags: ${{ steps.build-image-amd64.outputs.tags }} ${{ steps.build-image-amd64.outputs.tags }}
           registry: ${{ env.REGISTRY }}        
           username: ${{ github.actor }}
           password: ${{ secrets.GH_PAT }}
