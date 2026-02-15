@@ -56,7 +56,24 @@ jobs:
           tags: main${{ matrix.versionsuffix }}-arm64
           containerfiles: ${{ matrix.containerfile }}
 
-      - name: Push to registry
+      - name: Combine manifests
+        run: |
+          buildah manifest create ${{ env.MANIFEST_NAME }}
+          buildah manifest add ${{ env.MANIFEST_NAME }} ${{ env.MANIFEST_NAME }}-amd64
+          buildah manifest add ${{ env.MANIFEST_NAME }} ${{ env.MANIFEST_NAME }}-arm64
+        env:
+          MANIFEST_NAME: ${{ env.IMAGE_NAME }}:main${{ matrix.versionsuffix }}
+
+      - name: Push to registry (manifest)
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: main${{ matrix.versionsuffix }}
+          registry: ${{ env.REGISTRY }}        
+          username: ${{ github.actor }}
+          password: ${{ secrets.GH_PAT }}
+
+      - name: Push to registry (single platforms)
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ env.IMAGE_NAME }}
