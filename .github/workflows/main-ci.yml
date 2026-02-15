@@ -46,7 +46,7 @@ jobs:
           tags: main${{ matrix.versionsuffix }}-amd64
           containerfiles: ${{ matrix.containerfile }}
 
-      - name: Buildah build image
+      - name: Buildah build image (arm64)
         id: build-image-arm64
         uses: redhat-actions/buildah-build@v2
         with:
@@ -56,12 +56,11 @@ jobs:
           tags: main${{ matrix.versionsuffix }}-arm64
           containerfiles: ${{ matrix.containerfile }}
 
-
       - name: Push to registry
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ env.IMAGE_NAME }}
-          tags: ${{ steps.build-image-amd64.outputs.tags }} ${{ steps.build-image-amd64.outputs.tags }}
+          tags: ${{ steps.build-image-amd64.outputs.tags }} ${{ steps.build-image-arm64.outputs.tags }}
           registry: ${{ env.REGISTRY }}        
           username: ${{ github.actor }}
           password: ${{ secrets.GH_PAT }}
