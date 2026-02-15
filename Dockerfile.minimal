@@ -9,7 +9,7 @@ ARG ALPINE_VERSION=3.23
 FROM --platform=${BUILDPLATFORM} alpine:${ALPINE_VERSION} AS builder
 
 ### Build argument(s)
-ARG TARGETOS TARGETARCH TAILSCALE_VERSION=v1.94.1
+ARG TARGETOS TARGETARCH TAILSCALE_VERSION=v1.94.2
 
 ### Only include these featuretags 
 ### - https://github.com/tailscale/tailscale/blob/main/feature/featuretags/featuretags.go
