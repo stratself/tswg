@@ -21,6 +21,9 @@ jobs:
       REGISTRY: ghcr.io/${{ github.actor }}
       STORAGE_DRIVER: vfs
 
+    permissions:
+      packages: write
+
     strategy:
       matrix:
         include:
@@ -71,7 +74,7 @@ jobs:
           tags: main${{ matrix.versionsuffix }}
           registry: ${{ env.REGISTRY }}        
           username: ${{ github.actor }}
-          password: ${{ secrets.GH_PAT }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push to registry (single platforms)
         uses: redhat-actions/push-to-registry@v2
@@ -80,5 +83,5 @@ jobs:
           tags: ${{ steps.build-image-amd64.outputs.tags }} ${{ steps.build-image-arm64.outputs.tags }}
           registry: ${{ env.REGISTRY }}        
           username: ${{ github.actor }}
-          password: ${{ secrets.GH_PAT }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
