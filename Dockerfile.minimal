@@ -13,7 +13,7 @@ ARG TARGETOS TARGETARCH TAILSCALE_VERSION=v1.98.3
 
 ### Only include these featuretags 
 ### - https://github.com/tailscale/tailscale/blob/main/feature/featuretags/featuretags.go
-ARG FEATURETAGS="acme,advertiseexitnode,advertiseroutes,cli,clientmetrics,dns,gro,hujsonconf,lazywg,linkspeed,listenrawdisco,netstack,osrouter,serve,tailnetlock,unixsocketidentity"
+ARG FEATURETAGS="acme,advertiseexitnode,advertiseroutes,cli,clientmetrics,dns,gro,hujsonconf,ipnbus,lazywg,linkspeed,listenrawdisco,netstack,osrouter,serve,tailnetlock,unixsocketidentity"
 
 WORKDIR /build
 
