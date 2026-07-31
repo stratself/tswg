@@ -3,7 +3,7 @@
 # Thank you!
 
 # Global arguments
-ARG ALPINE_VERSION=3.23
+ARG ALPINE_VERSION=3.24
 
 ## Build container
 FROM --platform=${BUILDPLATFORM} alpine:${ALPINE_VERSION} AS builder
